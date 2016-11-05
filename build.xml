@@ -2,7 +2,7 @@
 <project name="demo" default="build">
     <property name="basedir" value="$(pwd)"/>
     <target name="build"
-            depends="phpcs,-check-failure"
+            depends="phpcs,phpunit,-check-failure"
     />
     <target name="phpcs"
             unless="phpcs.done"
@@ -18,6 +18,13 @@
         <property name="phpcs.done" value="true"/>
     </target>
 
+    <target name="phpunit"
+            unless="phpunit.done"
+            description="Run phpunit tests">
+        <exec executable="${basedir}/vendor/bin/phpunit" resultproperty="result.phpunit" taskname="phpunit">
+        </exec>
+        <property name="phpunit.done" value="true"/>
+    </target>
 
     <target name="-check-failure">
         <fail message="Build did not finish successfully">
@@ -25,6 +32,9 @@
                 <or>
                     <not>
                         <equals arg1="${result.phpcs}" arg2="0"/>
+                    </not>
+                    <not>
+                        <equals arg1="${result.phpunit}" arg2="0"/>
                     </not>
                 </or>
             </condition>
